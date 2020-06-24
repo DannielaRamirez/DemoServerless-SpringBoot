@@ -15,6 +15,7 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 
+	compile group: 'com.amazonaws.serverless', name: 'aws-serverless-java-container-springboot2', version: '1.5'
 	compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.808'
 
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -24,4 +25,12 @@ dependencies {
 
 test {
 	useJUnitPlatform()
+}
+
+task buildZip(type: Zip) {
+	from compileJava
+	from processResources
+	into('lib') {
+		from configurations.runtimeClasspath
+	}
 }

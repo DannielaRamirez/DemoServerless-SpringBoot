@@ -14,7 +14,7 @@ public class AwsConfig {
 	private String awsRegion;
 
 	@Bean
-	public DynamoDBMapper getDynamoDbMapper() {
+	public DynamoDBMapper dynamoDbMapper() {
 		final AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.standard()
 			.withRegion(awsRegion)
 			.build()
