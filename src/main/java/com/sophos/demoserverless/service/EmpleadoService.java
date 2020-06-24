@@ -6,6 +6,8 @@ import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.sophos.demoserverless.beans.EmpleadoRequest;
 import com.sophos.demoserverless.beans.EmpleadoResponse;
 import com.sophos.demoserverless.model.Empleado;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 public class EmpleadoService {
 
 	private static final String HK_PARAMETRO = "EMPLEADO";
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmpleadoService.class);
 
 	private final DynamoDBMapper mapper;
 
@@ -93,6 +96,7 @@ public class EmpleadoService {
 		empleado.setNombre(request.getNombre());
 		empleado.setEdad(request.getEdad());
 		empleado.setCiudad(request.getCiudad());
+		LOGGER.info("Request: {}", request);
 	}
 
 	private EmpleadoResponse mapResponse(Empleado empleado) {
@@ -102,6 +106,7 @@ public class EmpleadoService {
 		response.setNombre(empleado.getNombre());
 		response.setEdad(empleado.getEdad());
 		response.setCiudad(empleado.getCiudad());
+		LOGGER.info("Response: {}", response);
 		return response;
 	}
 
