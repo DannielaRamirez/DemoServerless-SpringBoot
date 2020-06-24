@@ -4,16 +4,20 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AwsConfig {
 
+	@Value("${aws.region:us-west-1}")
+	private String awsRegion;
+
 	@Bean
 	public DynamoDBMapper getDynamoDbMapper() {
 		final AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.standard()
-			.withRegion(Regions.US_WEST_1)
+			.withRegion(awsRegion)
 			.build()
 		;
 		return new DynamoDBMapper(dynamoDB);
