@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/empleados")
+@CrossOrigin
 public class EmpleadoController {
 
 	private final EmpleadoService empleadoService;
