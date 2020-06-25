@@ -1,9 +1,6 @@
 package com.sophos.demoserverless.model;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.datamodeling.*;
 
 @DynamoDBTable(tableName = "DemoServerless")
 public class Empleado {
@@ -14,7 +11,7 @@ public class Empleado {
 	@DynamoDBRangeKey
 	private String sk;
 
-	@DynamoDBAttribute
+	@DynamoDBIndexHashKey(globalSecondaryIndexName = "cedula-index")
 	private String cedula;
 
 	@DynamoDBAttribute

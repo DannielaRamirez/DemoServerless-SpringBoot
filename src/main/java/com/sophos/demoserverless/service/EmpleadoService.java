@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 public class EmpleadoService {
 
 	private static final String HK_PARAMETRO = "EMPLEADO";
+	private static final String GSI_CEDULA = "cedula-index";
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmpleadoService.class);
 
 	private final DynamoDBMapper mapper;
@@ -63,6 +64,8 @@ public class EmpleadoService {
 	}
 
 	public EmpleadoResponse post(EmpleadoRequest request) {
+		validateCedula(request.getCedula(), null);
+
 		final Empleado empleado = new Empleado();
 		empleado.setHk(HK_PARAMETRO);
 		empleado.setSk(UUID.randomUUID().toString());
@@ -75,6 +78,7 @@ public class EmpleadoService {
 
 	public EmpleadoResponse put(UUID codigo, EmpleadoRequest request) {
 		get(codigo);
+		validateCedula(request.getCedula(), codigo);
 
 		final Empleado empleado = new Empleado();
 		empleado.setHk(HK_PARAMETRO);
@@ -158,6 +162,24 @@ public class EmpleadoService {
 			.strip()
 			.toLowerCase()
 		;
+	}
+
+	private void validateCedula(String cedula, UUID codigo) {
+		final Empleado empleado = new Empleado();
+		empleado.setCedula(cedula);
+
+		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<>();
+		queryExpression.setHashKeyValues(empleado);
+		queryExpression.setIndexName(GSI_CEDULA);
+		queryExpression.setConsistentRead(false);
+
+		final List<Empleado> empleados = mapper.query(Empleado.class, queryExpression);
+		if(!empleados.isEmpty() && (Objects.isNull(codigo) || !empleados.get(0).getSk().equals(codigo.toString()))) {
+			throw new ResponseStatusException(
+				HttpStatus.CONFLICT,
+				"Ya existe la cédula '" + cedula + "'"
+			);
+		}
 	}
 
 }
