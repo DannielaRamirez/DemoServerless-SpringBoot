@@ -14,7 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class EmpleadoService {
@@ -91,11 +93,43 @@ public class EmpleadoService {
 		mapper.delete(empleado);
 	}
 
+	public List<EmpleadoResponse> search(String query) {
+		final AtomicInteger idx = new AtomicInteger();
+		final Map<String, AttributeValue> eav = new HashMap<>();
+		final String filterExpression = Stream.of(query.split("\\s*\\+\\s*"))
+			.map(String::toLowerCase)
+			.map(filtro -> {
+				final String placeholder = ":var" + idx.incrementAndGet();
+				eav.put(placeholder, new AttributeValue(filtro));
+				return "contains(busqueda, " + placeholder + ")";
+			})
+			.collect(Collectors.joining(" and "))
+		;
+		eav.put(":hk", new AttributeValue(HK_PARAMETRO));
+
+		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<Empleado>()
+			.withKeyConditionExpression("hk = :hk")
+			.withFilterExpression(filterExpression)
+			.withExpressionAttributeValues(eav)
+		;
+
+		final List<Empleado> empleados = mapper.query(Empleado.class, queryExpression);
+		if(empleados.isEmpty()) {
+			throw new ResponseStatusException(
+				HttpStatus.NOT_FOUND,
+				"No existe ningún registro"
+			);
+		}
+
+		return empleados.stream().map(this::mapResponse).collect(Collectors.toList());
+	}
+
 	private void mapRequest(Empleado empleado, EmpleadoRequest request) {
 		empleado.setCedula(request.getCedula());
 		empleado.setNombre(request.getNombre());
 		empleado.setEdad(request.getEdad());
 		empleado.setCiudad(request.getCiudad());
+		empleado.setBusqueda(generateSearchField(empleado));
 		LOGGER.info("Request: {}", request);
 	}
 
@@ -108,6 +142,22 @@ public class EmpleadoService {
 		response.setCiudad(empleado.getCiudad());
 		LOGGER.info("Response: {}", response);
 		return response;
+	}
+
+	private String generateSearchField(Empleado empleado) {
+		return String.join(
+				" ",
+				List.of(
+					empleado.getSk(),
+					empleado.getCedula(),
+					empleado.getNombre(),
+					String.valueOf(empleado.getEdad()),
+					empleado.getCiudad()
+				)
+			)
+			.strip()
+			.toLowerCase()
+		;
 	}
 
 }

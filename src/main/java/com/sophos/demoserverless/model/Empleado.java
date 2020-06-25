@@ -26,6 +26,9 @@ public class Empleado {
 	@DynamoDBAttribute
 	private String ciudad;
 
+	@DynamoDBAttribute
+	private String busqueda;
+
 	public String getHk() {
 		return hk;
 	}
@@ -72,6 +75,14 @@ public class Empleado {
 
 	public void setCiudad(String ciudad) {
 		this.ciudad = ciudad;
+	}
+
+	public String getBusqueda() {
+		return busqueda;
+	}
+
+	public void setBusqueda(String busqueda) {
+		this.busqueda = busqueda;
 	}
 
 }

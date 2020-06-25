@@ -49,4 +49,9 @@ public class EmpleadoController {
 		return ResponseEntity.ok().build();
 	}
 
+	@GetMapping("/buscar/{query}")
+	public List<EmpleadoResponse> search(@PathVariable String query) {
+		return empleadoService.search(query);
+	}
+
 }
