@@ -2,6 +2,7 @@ plugins {
 	id 'org.springframework.boot' version '2.3.1.RELEASE'
 	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
 	id 'java'
+	id "org.sonarqube" version '2.8'
 }
 
 group = 'com.sophos'
@@ -32,5 +33,14 @@ task buildZip(type: Zip) {
 	from processResources
 	into('lib') {
 		from configurations.runtimeClasspath
+	}
+}
+
+sonarqube {
+	properties {
+		property "sonar.projectKey", "rjrb_DemoServerless-SpringBoot"
+		property "sonar.organization", "rjrb"
+		property "sonar.host.url", "https://sonarcloud.io"
+		property "sonar.login", "d03c135964aa388462ba06e9dffcca68baf25d6f"
 	}
 }
