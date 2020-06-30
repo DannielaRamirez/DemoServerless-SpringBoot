@@ -133,6 +133,13 @@ class DemoServerlessApplicationTests {
 				.andExpect(jsonPath("$.ciudad").value(responsePut.getCiudad()))
 			;
 
+			// Hace una búsqueda
+			mvc.perform(get("/empleados/buscar/{query}", String.join("+", request.getCedula(), request.getCiudad())))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$").isArray())
+				.andExpect(jsonPath("[0].codigo").value(codigo.toString()))
+			;
+
 		} finally {
 
 			// Elimina el empleado creado
