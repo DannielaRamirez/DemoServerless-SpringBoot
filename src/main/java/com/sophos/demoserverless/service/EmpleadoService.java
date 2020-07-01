@@ -134,7 +134,6 @@ public class EmpleadoService {
 		empleado.setEdad(request.getEdad());
 		empleado.setCiudad(request.getCiudad());
 		empleado.setBusqueda(generateSearchField(empleado));
-		LOGGER.info("Request: {}", request);
 	}
 
 	private EmpleadoResponse mapResponse(Empleado empleado) {
@@ -144,7 +143,6 @@ public class EmpleadoService {
 		response.setNombre(empleado.getNombre());
 		response.setEdad(empleado.getEdad());
 		response.setCiudad(empleado.getCiudad());
-		LOGGER.info("Response: {}", response);
 		return response;
 	}
 

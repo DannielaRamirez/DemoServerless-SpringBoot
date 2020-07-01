@@ -45,3 +45,15 @@ sonarqube {
 		property "sonar.login", "d03c135964aa388462ba06e9dffcca68baf25d6f"
 	}
 }
+
+// JaCoCo
+jacocoTestReport {
+	reports {
+		html.enabled = true
+		xml.enabled = true
+		csv.enabled = false
+	}
+}
+jacoco {
+	reportsDir = file("$buildDir/jacoco")
+}
