@@ -17,8 +17,7 @@ public class LambdaHandler implements RequestHandler<AwsProxyRequest, AwsProxyRe
 		try {
 			handler = SpringBootLambdaContainerHandler.getAwsProxyHandler(DemoServerlessApplication.class);
 		} catch (ContainerInitializationException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Could not initialize Spring Boot application", e);
+			throw new IllegalStateException("Could not initialize Spring Boot application", e);
 		}
 	}
 
