@@ -4,9 +4,6 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBQueryExpression;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.sophos.demoserverless.model.Empleado;
-import com.sophos.demoserverless.service.EmpleadoService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -68,7 +65,7 @@ public class EmpleadoRepository {
 		return mapper.query(Empleado.class, queryExpression);
 	}
 
-	public List<Empleado> buscar(String query) {
+	public List<Empleado> search(String query) {
 		final AtomicInteger idx = new AtomicInteger();
 		final Map<String, AttributeValue> eav = new HashMap<>();
 		final String filterExpression = Stream.of(query.split("\\s*\\+\\s*"))

@@ -71,7 +71,7 @@ public class EmpleadoService {
 	}
 
 	public List<EmpleadoResponse> search(String query) {
-		final List<Empleado> empleados = empleadoRepository.buscar(query);
+		final List<Empleado> empleados = empleadoRepository.search(query);
 		if(empleados.isEmpty()) {
 			throw new ResponseStatusException(
 				HttpStatus.NOT_FOUND,

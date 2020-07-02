@@ -26,13 +26,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureMockMvc
-class DemoServerlessApplicationTests {
+class TestApi {
 
 	private final MockMvc mvc;
 	private final ObjectMapper objectMapper;
 
 	@Autowired
-	public DemoServerlessApplicationTests(MockMvc mvc) {
+	public TestApi(MockMvc mvc) {
 		this.mvc = mvc;
 
 		objectMapper = new ObjectMapper();
