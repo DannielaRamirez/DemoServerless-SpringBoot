@@ -41,6 +41,12 @@ class TestApi {
 
 	@Test
 	void testApi() throws Exception {
+		// Ping
+		mvc.perform(get("/ping"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.ping").exists())
+		;
+
 		// Instancia del código
 		UUID codigo = null;
 

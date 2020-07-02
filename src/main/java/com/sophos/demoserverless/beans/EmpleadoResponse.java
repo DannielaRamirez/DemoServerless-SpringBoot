@@ -10,17 +10,6 @@ public class EmpleadoResponse {
 	private Integer edad;
 	private String ciudad;
 
-	@Override
-	public String toString() {
-		return "EmpleadoResponse{" +
-			"codigo=" + codigo +
-			", cedula='" + cedula + '\'' +
-			", nombre='" + nombre + '\'' +
-			", edad=" + edad +
-			", ciudad='" + ciudad + '\'' +
-		'}';
-	}
-
 	public UUID getCodigo() {
 		return codigo;
 	}

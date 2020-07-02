@@ -76,7 +76,6 @@ public class TestExceptions {
 
 		// Cédula prueba
 		final String cedula = UUID.randomUUID().toString();
-		BDDMockito.given(empleadoRepository.findByCedula(cedula)).willReturn(List.of(new Empleado()));
 
 		// Payload
 		final EmpleadoRequest request = new EmpleadoRequest();
@@ -85,7 +84,24 @@ public class TestExceptions {
 		request.setEdad(30);
 		request.setCiudad("Ciudad de prueba");
 
+		// Empleado dummy
+		final Empleado empleado = new Empleado();
+		empleado.setSk(codigo.toString());
+		empleado.setCedula(cedula);
+
+		// Actualiza empleado inexistente
+		final Exception exPutId = mvc.perform(
+			put("/empleados/{codigo}", codigo)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
+			)
+			.andExpect(status().isNotFound())
+			.andReturn().getResolvedException()
+		;
+		Assertions.assertThat(exPutId).isInstanceOf(ResponseStatusException.class);
+
 		// Post con cédula existente
+		BDDMockito.given(empleadoRepository.findByCedula(cedula)).willReturn(List.of(empleado));
 		final Exception exPost = mvc.perform(
 				post("/empleados")
 					.contentType(MediaType.APPLICATION_JSON)
@@ -96,16 +112,19 @@ public class TestExceptions {
 		;
 		Assertions.assertThat(exPost).isInstanceOf(ResponseStatusException.class);
 
-		// Actualiza empleado inexistente
-		final Exception exPutId = mvc.perform(
-				put("/empleados/{codigo}", codigo)
-					.contentType(MediaType.APPLICATION_JSON)
-					.content(objectMapper.writeValueAsString(request))
+		// Actualiza cédula en uso
+		empleado.setSk(UUID.randomUUID().toString());
+		BDDMockito.given(empleadoRepository.findById(codigo)).willReturn(Optional.of(empleado));
+		final Exception exPutCed = mvc.perform(
+			put("/empleados/{codigo}", codigo)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
 			)
-			.andExpect(status().isNotFound())
+			.andExpect(status().isConflict())
 			.andReturn().getResolvedException()
 		;
-		Assertions.assertThat(exPutId).isInstanceOf(ResponseStatusException.class);
+		Assertions.assertThat(exPutCed).isInstanceOf(ResponseStatusException.class);
+
 	}
 
 }

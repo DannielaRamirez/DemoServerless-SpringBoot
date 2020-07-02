@@ -7,16 +7,6 @@ public class EmpleadoRequest {
 	private Integer edad;
 	private String ciudad;
 
-	@Override
-	public String toString() {
-		return "EmpleadoRequest{" +
-			"cedula='" + cedula + '\'' +
-			", nombre='" + nombre + '\'' +
-			", edad=" + edad +
-			", ciudad='" + ciudad + '\'' +
-		'}';
-	}
-
 	public String getCedula() {
 		return cedula;
 	}
