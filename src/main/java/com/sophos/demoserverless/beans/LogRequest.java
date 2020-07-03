@@ -1,12 +1,11 @@
 package com.sophos.demoserverless.beans;
 
-import com.sophos.demoserverless.model.Empleado;
-
 public class LogRequest {
 
 	private String responsable;
 	private String metodo;
-	private Empleado entidad;
+	private String codigo;
+	private EmpleadoResponse entidad;
 
 	public String getResponsable() {
 		return responsable;
@@ -24,11 +23,19 @@ public class LogRequest {
 		this.metodo = metodo;
 	}
 
-	public Empleado getEntidad() {
+	public String getCodigo() {
+		return codigo;
+	}
+
+	public void setCodigo(String codigo) {
+		this.codigo = codigo;
+	}
+
+	public EmpleadoResponse getEntidad() {
 		return entidad;
 	}
 
-	public void setEntidad(Empleado entidad) {
+	public void setEntidad(EmpleadoResponse entidad) {
 		this.entidad = entidad;
 	}
 

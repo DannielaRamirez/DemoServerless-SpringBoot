@@ -5,8 +5,8 @@ import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sophos.demoserverless.beans.EmpleadoResponse;
 import com.sophos.demoserverless.beans.LogRequest;
-import com.sophos.demoserverless.model.Empleado;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Service
 public class SqsService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(EmpleadoService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SqsService.class);
 	private static final String MESSAGE_GROUP_ID = "5BfpLY9VkP6s5CaHaJJsLFnCAdxZN2FQbnXJpZdf";
 
 	@Value("${aws.sqsurl:}")
@@ -33,10 +33,11 @@ public class SqsService {
 		objectMapper.findAndRegisterModules();
 	}
 
-	public void queueLog(Empleado empleado, String responsable, String metodo) {
+	public void queueLog(EmpleadoResponse empleado, String responsable, String metodo) {
 		final LogRequest logRequest = new LogRequest();
 		logRequest.setResponsable(responsable);
 		logRequest.setMetodo(metodo);
+		logRequest.setCodigo(empleado.getCodigo().toString());
 		logRequest.setEntidad(empleado);
 
 		try {

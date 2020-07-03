@@ -53,9 +53,11 @@ public class EmpleadoService {
 		empleado.setSk(UUID.randomUUID().toString());
 		mapRequest(empleado, request);
 
-		sqsService.queueLog(empleado, "", "POST");
+		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		return mapResponse(empleadoRepository.save(empleado));
+		sqsService.queueLog(response, "", "POST");
+
+		return response;
 	}
 
 	public EmpleadoResponse put(UUID codigo, EmpleadoRequest request) {
@@ -67,9 +69,11 @@ public class EmpleadoService {
 		empleado.setSk(codigo.toString());
 		mapRequest(empleado, request);
 
-		sqsService.queueLog(empleado, "", "PUT");
+		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		return mapResponse(empleadoRepository.save(empleado));
+		sqsService.queueLog(response, "", "POST");
+
+		return response;
 	}
 
 	public void delete(UUID codigo) {
