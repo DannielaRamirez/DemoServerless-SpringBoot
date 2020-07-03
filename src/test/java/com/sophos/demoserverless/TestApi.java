@@ -1,5 +1,8 @@
 package com.sophos.demoserverless;
 
+import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
+import com.amazonaws.services.sqs.model.SendMessageResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sophos.demoserverless.beans.EmpleadoRequest;
 import com.sophos.demoserverless.beans.EmpleadoResponse;
@@ -7,9 +10,11 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -31,6 +36,9 @@ class TestApi {
 	private final MockMvc mvc;
 	private final ObjectMapper objectMapper;
 
+	@MockBean
+	private AmazonSQS sqs;
+
 	@Autowired
 	public TestApi(MockMvc mvc) {
 		this.mvc = mvc;
@@ -41,6 +49,9 @@ class TestApi {
 
 	@Test
 	void testApi() throws Exception {
+		// Impide el registro en la cola de los eventos de prueba
+		Mockito.doAnswer(invocation -> new SendMessageResult()).when(sqs).sendMessage(new SendMessageRequest());
+
 		// Ping
 		mvc.perform(get("/ping"))
 			.andExpect(status().isOk())
