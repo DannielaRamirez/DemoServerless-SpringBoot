@@ -18,10 +18,12 @@ import java.util.stream.Collectors;
 public class EmpleadoService {
 
 	private final EmpleadoRepository empleadoRepository;
+	private final SqsService sqsService;
 
 	@Autowired
-	public EmpleadoService(EmpleadoRepository empleadoRepository) {
+	public EmpleadoService(EmpleadoRepository empleadoRepository, SqsService sqsService) {
 		this.empleadoRepository = empleadoRepository;
+		this.sqsService = sqsService;
 	}
 
 	public List<EmpleadoResponse> getAll() {
@@ -51,6 +53,8 @@ public class EmpleadoService {
 		empleado.setSk(UUID.randomUUID().toString());
 		mapRequest(empleado, request);
 
+		sqsService.queueLog(empleado, "", "POST");
+
 		return mapResponse(empleadoRepository.save(empleado));
 	}
 
@@ -62,6 +66,8 @@ public class EmpleadoService {
 		empleado.setHk(EmpleadoRepository.HK_PARAMETRO);
 		empleado.setSk(codigo.toString());
 		mapRequest(empleado, request);
+
+		sqsService.queueLog(empleado, "", "PUT");
 
 		return mapResponse(empleadoRepository.save(empleado));
 	}
