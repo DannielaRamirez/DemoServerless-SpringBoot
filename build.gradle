@@ -60,6 +60,17 @@ jacocoTestReport {
 		xml.enabled = true
 		csv.enabled = false
 	}
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(
+				dir: it,
+				exclude: [
+					'com/sophos/demoserverless/DemoServerlessApplication.class',
+					'com/sophos/demoserverless/LambdaHandler.class'
+				]
+			)
+		}))
+	}
 }
 jacoco {
 	reportsDir = file("$buildDir/jacoco")
