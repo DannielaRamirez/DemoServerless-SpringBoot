@@ -66,7 +66,7 @@ class TestApi {
 		request.setCedula("5647382910");
 		request.setNombre("Empleado Prueba");
 		request.setEdad(30);
-		request.setCiudad("Cartagena");
+		request.setCiudad("c");
 
 		try {
 
@@ -119,7 +119,7 @@ class TestApi {
 
 			// Actualiza el empleado
 			request.setEdad(25);
-			request.setCiudad("Pereira");
+			request.setCiudad("Cartagena");
 			final EmpleadoResponse responsePut = objectMapper.readValue(
 				mvc.perform(
 					put("/empleados/{codigo}", codigo)
