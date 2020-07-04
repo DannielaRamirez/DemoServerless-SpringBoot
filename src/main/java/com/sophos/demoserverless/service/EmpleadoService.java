@@ -4,6 +4,7 @@ import com.sophos.demoserverless.beans.EmpleadoRequest;
 import com.sophos.demoserverless.beans.EmpleadoResponse;
 import com.sophos.demoserverless.model.Empleado;
 import com.sophos.demoserverless.repository.EmpleadoRepository;
+import com.sophos.demoserverless.utils.Utilidades;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class EmpleadoService {
@@ -95,9 +95,9 @@ public class EmpleadoService {
 
 	private void mapRequest(Empleado empleado, EmpleadoRequest request) {
 		empleado.setCedula(request.getCedula().strip());
-		empleado.setNombre(capitalize(request.getNombre()));
+		empleado.setNombre(Utilidades.capitalize(request.getNombre()));
 		empleado.setEdad(request.getEdad());
-		empleado.setCiudad(capitalize(request.getCiudad()));
+		empleado.setCiudad(Utilidades.capitalize(request.getCiudad()));
 		empleado.setBusqueda(generateSearchField(empleado));
 	}
 
@@ -135,14 +135,6 @@ public class EmpleadoService {
 				"Ya existe la cédula '" + cedula + "'"
 			);
 		}
-	}
-
-	private String capitalize(String texto) {
-		return Stream.ofNullable(texto.strip().split("\\s+"))
-			.flatMap(Stream::of)
-			.map(word -> word.length() == 1 ? word.toUpperCase() : word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
-			.collect(Collectors.joining(" "))
-		;
 	}
 
 }

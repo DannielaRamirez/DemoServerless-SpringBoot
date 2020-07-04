@@ -6,6 +6,7 @@ import com.amazonaws.services.sqs.model.SendMessageResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sophos.demoserverless.beans.EmpleadoRequest;
 import com.sophos.demoserverless.beans.EmpleadoResponse;
+import com.sophos.demoserverless.utils.Utilidades;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -91,9 +92,9 @@ class TestApi {
 			// Valida la respuesta
 			Assertions.assertThat(responsePost)
 				.hasFieldOrPropertyWithValue("cedula", request.getCedula())
-				.hasFieldOrPropertyWithValue("nombre", request.getNombre())
+				.hasFieldOrPropertyWithValue("nombre", Utilidades.capitalize(request.getNombre()))
 				.hasFieldOrPropertyWithValue("edad", request.getEdad())
-				.hasFieldOrPropertyWithValue("ciudad", request.getCiudad())
+				.hasFieldOrPropertyWithValue("ciudad", Utilidades.capitalize(request.getCiudad()))
 			;
 
 			// Consulta todos los empleados
