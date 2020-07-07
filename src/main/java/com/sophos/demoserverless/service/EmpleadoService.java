@@ -3,6 +3,7 @@ package com.sophos.demoserverless.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sophos.demoserverless.beans.EmpleadoRequest;
 import com.sophos.demoserverless.beans.EmpleadoResponse;
+import com.sophos.demoserverless.beans.LogRequest;
 import com.sophos.demoserverless.model.Empleado;
 import com.sophos.demoserverless.repository.EmpleadoRepository;
 import com.sophos.demoserverless.utils.Utilidades;
@@ -12,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import reactor.core.publisher.EmitterProcessor;
+import reactor.core.publisher.FluxSink;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,14 +25,24 @@ import java.util.stream.Collectors;
 public class EmpleadoService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EmpleadoService.class);
+	private static final String RESPONSABLE = "SpringBoot";
 
 	private final EmpleadoRepository empleadoRepository;
-	private final SqsService sqsService;
+
+	private final EmitterProcessor<LogRequest> processor = EmitterProcessor.create();
+	private final FluxSink<LogRequest> sink = processor.sink();
 
 	@Autowired
 	public EmpleadoService(EmpleadoRepository empleadoRepository, SqsService sqsService) {
 		this.empleadoRepository = empleadoRepository;
-		this.sqsService = sqsService;
+
+		processor.subscribe(logRequest -> {
+			try {
+				sqsService.queueLog(logRequest);
+			} catch (JsonProcessingException e) {
+				LOGGER.error("Error encolando el log de operaciones", e);
+			}
+		});
 	}
 
 	public List<EmpleadoResponse> getAll() {
@@ -61,11 +74,12 @@ public class EmpleadoService {
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		try {
-			sqsService.queueLog(response, "", "POST");
-		} catch (JsonProcessingException e) {
-			LOGGER.error("Error encolando el log de la adición", e);
-		}
+		final LogRequest logRequest = new LogRequest();
+		logRequest.setResponsable(RESPONSABLE);
+		logRequest.setMetodo("POST");
+		logRequest.setCodigo(response.getCodigo().toString());
+		logRequest.setEntidad(response);
+		sink.next(logRequest);
 
 		return response;
 	}
@@ -81,11 +95,12 @@ public class EmpleadoService {
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		try {
-			sqsService.queueLog(response, "", "PUT");
-		} catch (JsonProcessingException e) {
-			LOGGER.error("Error encolando el log de la actualización", e);
-		}
+		final LogRequest logRequest = new LogRequest();
+		logRequest.setResponsable(RESPONSABLE);
+		logRequest.setMetodo("PUT");
+		logRequest.setCodigo(response.getCodigo().toString());
+		logRequest.setEntidad(response);
+		sink.next(logRequest);
 
 		return response;
 	}

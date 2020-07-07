@@ -1,13 +1,17 @@
 package com.sophos.demoserverless;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sophos.demoserverless.beans.EmpleadoRequest;
+import com.sophos.demoserverless.beans.LogRequest;
 import com.sophos.demoserverless.model.Empleado;
 import com.sophos.demoserverless.repository.EmpleadoRepository;
+import com.sophos.demoserverless.service.SqsService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -44,6 +48,9 @@ class TestExceptions {
 
 	@MockBean
 	private EmpleadoRepository empleadoRepository;
+
+	@MockBean
+	private SqsService sqsService;
 
 	@Test
 	void testExceptions() throws Exception {
@@ -125,6 +132,18 @@ class TestExceptions {
 		;
 		Assertions.assertThat(exPutCed).isInstanceOf(ResponseStatusException.class);
 
+		// Excepción al encolar
+		empleado.setSk(codigo.toString());
+		BDDMockito.given(empleadoRepository.findById(codigo)).willReturn(Optional.of(empleado));
+		BDDMockito.given(empleadoRepository.save(ArgumentMatchers.any(Empleado.class))).willReturn(empleado);
+		BDDMockito.willThrow(JsonProcessingException.class).given(sqsService).queueLog(ArgumentMatchers.any(LogRequest.class));
+		mvc.perform(
+			put("/empleados/{codigo}", codigo)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
+		)
+			.andExpect(status().isOk())
+		;
 	}
 
 }

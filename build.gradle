@@ -20,6 +20,7 @@ dependencies {
 	compile group: 'com.amazonaws.serverless', name: 'aws-serverless-java-container-springboot2', version: '1.5'
 	compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.815'
 	compile group: 'com.amazonaws', name: 'aws-java-sdk-sqs', version: '1.11.815'
+	compile group: 'io.projectreactor', name: 'reactor-core', version: '3.3.7.RELEASE'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
