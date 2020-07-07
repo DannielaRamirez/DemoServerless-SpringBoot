@@ -16,8 +16,9 @@ import java.util.stream.Stream;
 public class EmpleadoRepository {
 
 	public static final String HK_EMPLEADOS = "EMPLEADO";
-	public static final String HK_LOG = "LOG";
+	private static final String HK_LOG = "LOG";
 	private static final String GSI_CEDULA = "cedula-index";
+	private static final String KEY_CONDITION_EXPRESSION = "hk = :hk";
 
 	private final DynamoDBMapper mapper;
 
@@ -31,7 +32,7 @@ public class EmpleadoRepository {
 		eav.put(":hk", new AttributeValue(HK_EMPLEADOS));
 
 		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<Empleado>()
-			.withKeyConditionExpression("hk = :hk")
+			.withKeyConditionExpression(KEY_CONDITION_EXPRESSION)
 			.withExpressionAttributeValues(eav)
 		;
 
@@ -85,7 +86,7 @@ public class EmpleadoRepository {
 		eav.put(":hk", new AttributeValue(HK_EMPLEADOS));
 
 		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<Empleado>()
-			.withKeyConditionExpression("hk = :hk")
+			.withKeyConditionExpression(KEY_CONDITION_EXPRESSION)
 			.withFilterExpression(filterExpression)
 			.withExpressionAttributeValues(eav)
 		;
@@ -99,7 +100,7 @@ public class EmpleadoRepository {
 		eav.put(":codigo", new AttributeValue(codigo.toString()));
 
 		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<Empleado>()
-			.withKeyConditionExpression("hk = :hk")
+			.withKeyConditionExpression(KEY_CONDITION_EXPRESSION)
 			.withFilterExpression("entidad.codigo = :codigo")
 			.withExpressionAttributeValues(eav)
 		;
