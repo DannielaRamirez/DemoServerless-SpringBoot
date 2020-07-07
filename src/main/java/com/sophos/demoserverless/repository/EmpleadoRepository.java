@@ -15,7 +15,8 @@ import java.util.stream.Stream;
 @Repository
 public class EmpleadoRepository {
 
-	public static final String HK_PARAMETRO = "EMPLEADO";
+	public static final String HK_EMPLEADOS = "EMPLEADO";
+	public static final String HK_LOG = "LOG";
 	private static final String GSI_CEDULA = "cedula-index";
 
 	private final DynamoDBMapper mapper;
@@ -27,7 +28,7 @@ public class EmpleadoRepository {
 
 	public List<Empleado> findAll() {
 		final Map<String, AttributeValue> eav = new HashMap<>();
-		eav.put(":hk", new AttributeValue(HK_PARAMETRO));
+		eav.put(":hk", new AttributeValue(HK_EMPLEADOS));
 
 		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<Empleado>()
 			.withKeyConditionExpression("hk = :hk")
@@ -38,7 +39,7 @@ public class EmpleadoRepository {
 	}
 
 	public Optional<Empleado> findById(UUID codigo) {
-		return Optional.ofNullable(mapper.load(Empleado.class, HK_PARAMETRO, codigo.toString()));
+		return Optional.ofNullable(mapper.load(Empleado.class, HK_EMPLEADOS, codigo.toString()));
 	}
 
 	public Empleado save(Empleado empleado) {
@@ -48,9 +49,13 @@ public class EmpleadoRepository {
 
 	public void deleteById(UUID codigo) {
 		final Empleado empleado = new Empleado();
-		empleado.setHk(HK_PARAMETRO);
+		empleado.setHk(HK_EMPLEADOS);
 		empleado.setSk(codigo.toString());
 		mapper.delete(empleado);
+	}
+
+	public void deleteAllLogs(Collection<Empleado> logs) {
+		mapper.batchDelete(logs);
 	}
 
 	public List<Empleado> findByCedula(String cedula) {
@@ -77,11 +82,25 @@ public class EmpleadoRepository {
 			})
 			.collect(Collectors.joining(" and "))
 		;
-		eav.put(":hk", new AttributeValue(HK_PARAMETRO));
+		eav.put(":hk", new AttributeValue(HK_EMPLEADOS));
 
 		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<Empleado>()
 			.withKeyConditionExpression("hk = :hk")
 			.withFilterExpression(filterExpression)
+			.withExpressionAttributeValues(eav)
+		;
+
+		return mapper.query(Empleado.class, queryExpression);
+	}
+
+	public List<Empleado> findLogsByCodigo(UUID codigo) {
+		final Map<String, AttributeValue> eav = new HashMap<>();
+		eav.put(":hk", new AttributeValue(HK_LOG));
+		eav.put(":codigo", new AttributeValue(codigo.toString()));
+
+		final DynamoDBQueryExpression<Empleado> queryExpression = new DynamoDBQueryExpression<Empleado>()
+			.withKeyConditionExpression("hk = :hk")
+			.withFilterExpression("entidad.codigo = :codigo")
 			.withExpressionAttributeValues(eav)
 		;
 

@@ -1,10 +1,13 @@
 package com.sophos.demoserverless.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sophos.demoserverless.beans.EmpleadoRequest;
 import com.sophos.demoserverless.beans.EmpleadoResponse;
 import com.sophos.demoserverless.model.Empleado;
 import com.sophos.demoserverless.repository.EmpleadoRepository;
 import com.sophos.demoserverless.utils.Utilidades;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class EmpleadoService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(EmpleadoService.class);
 
 	private final EmpleadoRepository empleadoRepository;
 	private final SqsService sqsService;
@@ -50,13 +55,17 @@ public class EmpleadoService {
 		validateCedula(request.getCedula(), null);
 
 		final Empleado empleado = new Empleado();
-		empleado.setHk(EmpleadoRepository.HK_PARAMETRO);
+		empleado.setHk(EmpleadoRepository.HK_EMPLEADOS);
 		empleado.setSk(UUID.randomUUID().toString());
 		mapRequest(empleado, request);
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		sqsService.queueLog(response, "", "POST");
+		try {
+			sqsService.queueLog(response, "", "POST");
+		} catch (JsonProcessingException e) {
+			LOGGER.error("Error encolando el log de la adición", e);
+		}
 
 		return response;
 	}
@@ -66,18 +75,25 @@ public class EmpleadoService {
 		validateCedula(request.getCedula(), codigo);
 
 		final Empleado empleado = new Empleado();
-		empleado.setHk(EmpleadoRepository.HK_PARAMETRO);
+		empleado.setHk(EmpleadoRepository.HK_EMPLEADOS);
 		empleado.setSk(codigo.toString());
 		mapRequest(empleado, request);
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		sqsService.queueLog(response, "", "PUT");
+		try {
+			sqsService.queueLog(response, "", "PUT");
+		} catch (JsonProcessingException e) {
+			LOGGER.error("Error encolando el log de la actualización", e);
+		}
 
 		return response;
 	}
 
 	public void delete(UUID codigo) {
+		final List<Empleado> logsEmpleado = empleadoRepository.findLogsByCodigo(codigo);
+		empleadoRepository.deleteAllLogs(logsEmpleado);
+
 		empleadoRepository.deleteById(codigo);
 	}
 
