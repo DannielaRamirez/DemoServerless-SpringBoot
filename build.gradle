@@ -21,6 +21,9 @@ dependencies {
 	compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: '1.11.815'
 	compile group: 'com.amazonaws', name: 'aws-java-sdk-sqs', version: '1.11.815'
 
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}

@@ -1,7 +1,10 @@
 package com.sophos.demoserverless.beans;
 
+import lombok.Data;
+
 import java.util.UUID;
 
+@Data
 public class EmpleadoResponse {
 
 	private UUID codigo;
@@ -9,45 +12,5 @@ public class EmpleadoResponse {
 	private String nombre;
 	private Integer edad;
 	private String ciudad;
-
-	public UUID getCodigo() {
-		return codigo;
-	}
-
-	public void setCodigo(UUID codigo) {
-		this.codigo = codigo;
-	}
-
-	public String getCedula() {
-		return cedula;
-	}
-
-	public void setCedula(String cedula) {
-		this.cedula = cedula;
-	}
-
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
-
-	public Integer getEdad() {
-		return edad;
-	}
-
-	public void setEdad(Integer edad) {
-		this.edad = edad;
-	}
-
-	public String getCiudad() {
-		return ciudad;
-	}
-
-	public void setCiudad(String ciudad) {
-		this.ciudad = ciudad;
-	}
 
 }
