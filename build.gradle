@@ -28,12 +28,6 @@ dependencies {
 
 test {
 	useJUnitPlatform()
-	jacoco {
-		excludes += [
-			'com.sophos.demoserverless.DemoServerlessApplication',
-			'com.sophos.demoserverless.LambdaHandler'
-		]
-	}
 }
 
 task buildZip(type: Zip) {
