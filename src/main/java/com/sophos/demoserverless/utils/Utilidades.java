@@ -1,5 +1,6 @@
 package com.sophos.demoserverless.utils;
 
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -15,6 +16,10 @@ public class Utilidades {
 			.map(word -> word.length() == 1 ? word.toUpperCase() : word.substring(0, 1).toUpperCase() + word.substring(1).toLowerCase())
 			.collect(Collectors.joining(" "))
 		;
+	}
+
+	public static boolean validarLongitudONulo(String texto, int longitudMaxima) {
+		return Objects.nonNull(texto) && texto.length() <= longitudMaxima;
 	}
 
 }

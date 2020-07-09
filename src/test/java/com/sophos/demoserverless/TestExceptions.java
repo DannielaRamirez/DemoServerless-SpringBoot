@@ -7,6 +7,7 @@ import com.sophos.demoserverless.beans.LogRequest;
 import com.sophos.demoserverless.model.Empleado;
 import com.sophos.demoserverless.repository.EmpleadoRepository;
 import com.sophos.demoserverless.service.SqsService;
+import com.sophos.demoserverless.utils.Utilidades;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -82,7 +83,7 @@ class TestExceptions {
 		Assertions.assertThat(exSearch).isInstanceOf(ResponseStatusException.class);
 
 		// Cédula prueba
-		final String cedula = UUID.randomUUID().toString();
+		final String cedula = UUID.randomUUID().toString().substring(0, 15);
 
 		// Payload
 		final EmpleadoRequest request = new EmpleadoRequest();
@@ -144,6 +145,41 @@ class TestExceptions {
 		)
 			.andExpect(status().isOk())
 		;
+
+		// Cédula muy larga
+		request.setCedula(UUID.randomUUID().toString());
+		mvc.perform(
+			post("/empleados")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
+			)
+			.andExpect(status().isUnprocessableEntity())
+		;
+
+		// Nombre muy largo
+		request.setCedula(cedula);
+		request.setNombre("N".repeat(60));
+		mvc.perform(
+			post("/empleados")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
+			)
+			.andExpect(status().isUnprocessableEntity())
+		;
+
+		// Ciudad muy larga
+		request.setNombre("Cualquier nombre");
+		request.setCiudad(UUID.randomUUID().toString());
+		mvc.perform(
+			post("/empleados")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request))
+			)
+			.andExpect(status().isUnprocessableEntity())
+		;
+
+		// Validar utilidades con un nulo
+		Assertions.assertThat(Utilidades.validarLongitudONulo(null, 1)).isFalse();
 	}
 
 }

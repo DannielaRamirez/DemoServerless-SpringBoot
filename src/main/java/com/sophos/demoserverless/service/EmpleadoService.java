@@ -17,6 +17,7 @@ import reactor.core.publisher.EmitterProcessor;
 import reactor.core.publisher.FluxSink;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -65,12 +66,12 @@ public class EmpleadoService {
 	}
 
 	public EmpleadoResponse post(EmpleadoRequest request) {
-		validateCedula(request.getCedula(), null);
-
 		final Empleado empleado = new Empleado();
 		empleado.setHk(EmpleadoRepository.HK_EMPLEADOS);
 		empleado.setSk(UUID.randomUUID().toString());
-		mapRequest(empleado, request);
+		mapAndValidateRequest(empleado, request);
+
+		validateCedula(request.getCedula(), null);
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
@@ -80,13 +81,13 @@ public class EmpleadoService {
 	}
 
 	public EmpleadoResponse put(UUID codigo, EmpleadoRequest request) {
-		get(codigo);
-		validateCedula(request.getCedula(), codigo);
-
 		final Empleado empleado = new Empleado();
 		empleado.setHk(EmpleadoRepository.HK_EMPLEADOS);
 		empleado.setSk(codigo.toString());
-		mapRequest(empleado, request);
+		mapAndValidateRequest(empleado, request);
+
+		get(codigo);
+		validateCedula(request.getCedula(), codigo);
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
@@ -114,7 +115,24 @@ public class EmpleadoService {
 		return empleados.stream().map(this::mapResponse).collect(Collectors.toList());
 	}
 
-	private void mapRequest(Empleado empleado, EmpleadoRequest request) {
+	private void validarRequest(EmpleadoRequest request) {
+		Map.of(
+			"cédula", Map.of("valor", request.getCedula(), "longitud", "15"),
+			"nombre", Map.of("valor", request.getNombre(), "longitud", "50"),
+			"ciudad", Map.of("valor", request.getCiudad(), "longitud", "25")
+		).forEach((campo, detalles) -> {
+			if(!Utilidades.validarLongitudONulo(detalles.get("valor"), Integer.parseInt(detalles.get("longitud")))) {
+				throw new ResponseStatusException(
+					HttpStatus.UNPROCESSABLE_ENTITY,
+					"Campo '" + campo + "' demasiado largo o nulo (máximo " + detalles.get("longitud") + " caracteres)"
+				);
+			}
+		});
+	}
+
+	private void mapAndValidateRequest(Empleado empleado, EmpleadoRequest request) {
+		validarRequest(request);
+
 		empleado.setCedula(request.getCedula().strip());
 		empleado.setNombre(Utilidades.capitalize(request.getNombre()));
 		empleado.setEdad(request.getEdad());
