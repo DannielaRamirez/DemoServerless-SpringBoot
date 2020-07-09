@@ -74,12 +74,7 @@ public class EmpleadoService {
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		final LogRequest logRequest = new LogRequest();
-		logRequest.setResponsable(RESPONSABLE);
-		logRequest.setMetodo("POST");
-		logRequest.setCodigo(response.getCodigo().toString());
-		logRequest.setEntidad(response);
-		sink.next(logRequest);
+		sendLogRequest("POST", response);
 
 		return response;
 	}
@@ -95,12 +90,7 @@ public class EmpleadoService {
 
 		final EmpleadoResponse response = mapResponse(empleadoRepository.save(empleado));
 
-		final LogRequest logRequest = new LogRequest();
-		logRequest.setResponsable(RESPONSABLE);
-		logRequest.setMetodo("PUT");
-		logRequest.setCodigo(response.getCodigo().toString());
-		logRequest.setEntidad(response);
-		sink.next(logRequest);
+		sendLogRequest("PUT", response);
 
 		return response;
 	}
@@ -166,6 +156,15 @@ public class EmpleadoService {
 				"Ya existe la cédula '" + cedula + "'"
 			);
 		}
+	}
+
+	private void sendLogRequest(String metodo, EmpleadoResponse response) {
+		final LogRequest logRequest = new LogRequest();
+		logRequest.setResponsable(RESPONSABLE);
+		logRequest.setMetodo(metodo);
+		logRequest.setCodigo(response.getCodigo().toString());
+		logRequest.setEntidad(response);
+		sink.next(logRequest);
 	}
 
 }
