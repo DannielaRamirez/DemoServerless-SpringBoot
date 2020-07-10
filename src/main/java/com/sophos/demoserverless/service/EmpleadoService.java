@@ -116,12 +116,15 @@ public class EmpleadoService {
 	}
 
 	private void validarRequest(EmpleadoRequest request) {
+		final String KEY_VALOR = "valor";
+		final String KEY_LONGITUD = "longitud";
+
 		Map.of(
-			"cédula", Map.of("valor", request.getCedula(), "longitud", "15"),
-			"nombre", Map.of("valor", request.getNombre(), "longitud", "50"),
-			"ciudad", Map.of("valor", request.getCiudad(), "longitud", "25")
+			"cédula", Map.of(KEY_VALOR, request.getCedula(), KEY_LONGITUD, "15"),
+			"nombre", Map.of(KEY_VALOR, request.getNombre(), KEY_LONGITUD, "50"),
+			"ciudad", Map.of(KEY_VALOR, request.getCiudad(), KEY_LONGITUD, "25")
 		).forEach((campo, detalles) -> {
-			if(!Utilidades.validarLongitudONulo(detalles.get("valor"), Integer.parseInt(detalles.get("longitud")))) {
+			if(!Utilidades.validarLongitudONulo(detalles.get(KEY_VALOR), Integer.parseInt(detalles.get(KEY_LONGITUD)))) {
 				throw new ResponseStatusException(
 					HttpStatus.UNPROCESSABLE_ENTITY,
 					"Campo '" + campo + "' demasiado largo o nulo (máximo " + detalles.get("longitud") + " caracteres)"
